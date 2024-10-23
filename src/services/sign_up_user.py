@@ -1,3 +1,4 @@
+from src.execptions.users import UserAlreadyExists
 from src.repository.base_users_repository import BaseUsersRepository
 from src.services.security import HashPassword
 
@@ -12,7 +13,7 @@ class SignUpUsers:
         # Проверяем, существует ли уже пользователь
         if self.__repository.exists(username):
             print("Пользователь с таким именем уже существует.")
-            return False
+            raise UserAlreadyExists
 
         # Хешируем пароль
         hashed_password = self.__security.hash(password)
