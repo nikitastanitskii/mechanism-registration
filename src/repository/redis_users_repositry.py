@@ -25,7 +25,3 @@ class RedisUsersRepository(BaseUsersRepository):
     def delete(self, username: str) -> None:
         if self.exists(username):
             redis_connector.hdel("users", username)
-
-    def get_all_profile(self,username: str) -> list:
-        keys = redis_connector.hkeys("users")
-        return [redis_connector.hget("users", key) for key in keys]

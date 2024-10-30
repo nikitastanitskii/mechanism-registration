@@ -14,7 +14,6 @@ class BaseUsersRepository(ABC):
     def get(self, username: str) -> str:
         pass
 
-
     @abstractmethod
     def create(self, username: str) -> None:
         pass
