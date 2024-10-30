@@ -8,8 +8,8 @@ class RedisUsersRepository(BaseUsersRepository):
     def exists(self, username: str) -> bool:
         return redis_connector.hexists("users", username)
 
-    def create(self, username: str, profile_data: dict) -> None:
-        redis_connector.hset("users", username,profile_data)
+    def create(self, username: str) -> None:
+        redis_connector.hset("users", username)
 
     def get(self, username: str) -> Any | None:
         profile = redis_connector.hget("users", username)
@@ -18,14 +18,14 @@ class RedisUsersRepository(BaseUsersRepository):
         else:
             return None
 
-
-    def update(self, username: str, updated_data: dict) -> None:
+    def update(self, username: str) -> None:
         if self.exists(username):
-            redis_connector.exists("users", username, updated_data)
+            redis_connector.exists("users", username)
 
     def delete(self, username: str) -> None:
         if self.exists(username):
-            redis_connector.delete("users", username)
+            redis_connector.hdel("users", username)
 
-    def get_all_profiles(self,username: str):
-        pass
+    def get_all_profile(self,username: str) -> list:
+        keys = redis_connector.hkeys("users")
+        return [redis_connector.hget("users", key) for key in keys]
