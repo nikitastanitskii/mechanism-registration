@@ -17,7 +17,7 @@ class SignInUsers:
         stored_password = self.__repository.get(username)
 
         # Проверяем пароль
-        if bcrypt.checkpw(password.encode("utf-8"), stored_password):
+        if bcrypt.checkpw(password.encode("utf-8"), stored_password.encode("utf-8")):
             print(f"Добро пожаловать, {username}!")
             return True
         else:

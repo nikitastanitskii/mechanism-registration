@@ -1,33 +1,23 @@
 from typing import List
 
 import uvicorn
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import Depends, FastAPI, HTTPException
 
-
-from fastapi import HTTPException, Depends
-
-
-from src.execptions.users import UserAlreadyExists
 from src.repository.redis_profile_repository import RedisProfileRepository
-from src.repository.redis_users_repositry import RedisUsersRepository
-from src.services.create_profile import CreateProfile, get_create_profile_service
+from src.services.create_profile import (CreateProfile,
+                                         get_create_profile_service)
+from src.services.delete_users import DeleteProfileService, get_profile_service
 from src.services.exceptions import ProfileAlreadyExists
-from src.services.schemas import UserProfileCreate
-from src.services.sign_in_user import SignInUsers
-from src.services.sign_up_user import SignUpUsers
-
-
+from src.services.get_all_profiles import (GetAllProfile,
+                                           get_all_profile_users_service)
+from src.services.get_profile_users import (GetProfileUsers,
+                                            get_profile_users_service)
+from src.services.model_data import UserProfileCreate
+from src.services.update_profile import (UpdateProfile,
+                                         get_update_profile_service)
 
 app = FastAPI()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 @app.post("/profiles/")
 def create_profile(
@@ -39,34 +29,46 @@ def create_profile(
         create_profile_service.create(profile)
         return {"message": "Профиль успешно создан."}
     except ProfileAlreadyExists:
-        raise HTTPException(status_code=400, detail="User already exists")
+        raise HTTPException(status_code=404, detail="Такой пользователь уже есть")
 
-    users_repository.update(username, updated_profile)
-    return {"message": "Данные профиля успешно обновлены"}
+
+@app.patch("/profiles/{username}")
+def update_profile(
+    username: str,
+    profile: UserProfileCreate,
+    update_profile_service: UpdateProfile = Depends(get_update_profile_service),
+):
+    """Обновление профиля пользователя"""
+    try:
+        update_profile_service.update(username, profile)
+        return {"message": "Профиль успешно обновлен"}
+    except ProfileAlreadyExists:
+        raise HTTPException(status_code=404, detail="Профиль не найден")
+
 
 @app.get("/profiles/{username}")
-def get_profile(username: str):
+def get_profile(
+    username: str,
+    profile: UserProfileCreate,
+    get_profile_service: GetProfileUsers = Depends(get_profile_users_service),
+):
     """Получение профиля пользователя"""
-    users_repository = RedisUsersRepository()
-    if not users_repository.exists(username):
-        raise HTTPException (
-            status_code = 404,detail = "Профиль не найден"
-        )
+    try:
+        return get_profile_service.get_profile(profile)
+    except ProfileAlreadyExists:
+        raise HTTPException(status_code=404, detail="Профиль не найден")
 
-    # Получаем профиль из базы данных
-    profile_data = users_repository.get(username)
-
-    # Возвращаем данные профиля
-    return UserProfileCreate(**profile_data)
 
 @app.get("/profiles/", response_model=List[UserProfileCreate])
-def get_all_profiles():
-    return [UserProfileCreate.model_validate_json(profile) for   profile in RedisProfileRepository().get_all()]
+def get_all_profiles(service: GetAllProfile = Depends(get_all_profile_users_service)):
+    return service.get_all_profiles()
 
-@app.delete("/profiles/{username}")
-def delete_profile(username: str):
-    """Удаление профиля пользователя"""
-    users_repository = RedisUsersRepository()
+
+@app.delete("/profiles/{username}", status_code=200)
+def delete_profile(
+    username: str, service: DeleteProfileService = Depends(get_profile_service)
+):
+    return service.delete_profile(username)
 
 
 if __name__ == "__main__":

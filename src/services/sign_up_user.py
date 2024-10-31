@@ -1,6 +1,6 @@
 from src.execptions.users import UserAlreadyExists
 from src.repository.base_users_repository import BaseUsersRepository
-from src.services.security import HashPassword
+from src.services.hash_security import HashPassword
 
 
 class SignUpUsers:
@@ -18,7 +18,7 @@ class SignUpUsers:
         # Хешируем пароль
         hashed_password = self.__security.hash(password)
 
-        # Сохраняем имя пользователя и хешированный пароль в Redis
-        self.__repository.create(username, hashed_password.decode("utf-8"))
+        if isinstance(hashed_password, bytes):
+            hashed_password = hashed_password.decode("utf-8")
         print(f"Пользователь {username} успешно зарегистрирован!")
         return True

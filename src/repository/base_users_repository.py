@@ -7,15 +7,11 @@ class BaseUsersRepository(ABC):
         pass
 
     @abstractmethod
-    def update(self, username: str) -> str:
+    def get(self, username: str) -> str | dict:
         pass
 
     @abstractmethod
-    def get(self, username: str) -> str:
-        pass
-
-    @abstractmethod
-    def create(self, username: str) -> None:
+    def create(self, username: str, password: str) -> dict:
         pass
 
     @abstractmethod

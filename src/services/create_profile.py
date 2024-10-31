@@ -1,8 +1,9 @@
 from fastapi import Depends
-from src.repository.profile_repository import BaseProfileRepository
+
+from src.repository.base_profile_repository import BaseProfileRepository
 from src.repository.redis_profile_repository import get_profile_repository
 from src.services.exceptions import ProfileAlreadyExists
-from src.services.schemas import UserProfileCreate
+from src.services.model_data import UserProfileCreate
 
 
 class CreateProfile:
@@ -12,7 +13,7 @@ class CreateProfile:
     def create(self, data: UserProfileCreate) -> None:
         """Функция для входа пользователя"""
         if self.__repository.exists(data.username):
-            raise ProfileAlreadyExists
+            raise ProfileAlreadyExists("Профиль не найден")
         else:
             self.__repository.create(data)
 
