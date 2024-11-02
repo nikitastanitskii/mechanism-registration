@@ -1,7 +1,8 @@
-from fastapi import Depends, HTTPException
+from fastapi import Depends
 
 from src.repository.base_profile_repository import BaseProfileRepository
 from src.repository.redis_profile_repository import get_profile_repository
+from src.services.exceptions import ProfileNotFound
 from src.services.model_data import UserProfileCreate
 
 
@@ -11,12 +12,12 @@ class UpdateProfile:
 
     def update(self, username: str, profile_data: UserProfileCreate):
         if not self.__repository.exists(username):
-            raise HTTPException(status_code=404, detail="Профиль не найден")
+            raise ProfileNotFound("Профиль не найден")
 
         current_profile = self.__repository.get(username)
 
         if current_profile is None:
-            raise HTTPException(status_code=404, detail="Профиль не найден")
+            raise ProfileNotFound("Профиль не найден")
 
         updated_profile = current_profile.copy()
         for key, value in profile_data.model_dump(exclude_unset=True).items():

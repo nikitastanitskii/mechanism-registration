@@ -17,16 +17,16 @@ class BaseProfileRepository(ABC):
         pass
 
     @abstractmethod
-    def get(self, username: str) -> dict:
+    def get_profile(self, profile: UserProfileCreate) -> None:
         pass
 
     @abstractmethod
-    def get_profile(self, profile: UserProfileCreate) -> dict:
+    def get_all_profiles(self, username: UserProfileCreate) -> list[UserProfileCreate]:
         pass
 
     @abstractmethod
-    def get_all_profiles(self, username: UserProfileCreate) -> dict:
+    def get(self, username: str) -> None:
         pass
 
-    def delete(self, username: UserProfileCreate) -> None:
+    def delete(self, username: UserProfileCreate) -> bool:
         pass

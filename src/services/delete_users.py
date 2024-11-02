@@ -1,7 +1,8 @@
-from fastapi import Depends, HTTPException
+from fastapi import Depends
 
 from src.repository.base_profile_repository import BaseProfileRepository
-from src.repository.redis_profile_repository import RedisProfileRepository
+from src.repository.redis_profile_repository import get_profile_repository
+from src.services.exceptions import ProfileNotFound
 
 
 class DeleteProfileService:
@@ -9,13 +10,14 @@ class DeleteProfileService:
         self.__repository = profile_repository
 
     def delete_profile(self, username: str):
-        # Пытаемся удалить профиль, если он существует
-        if not self.__repository.delete(username):
-            raise HTTPException(status_code=404, detail="Профиль не найден")
-        return {"message": "Профиль успешно удалён"}
+        if self.__repository.exists(username):
+            self.__repository.delete(username)
+            return {"message": "Профиль успешно удалён"}
+        else:
+            raise ProfileNotFound("Профиль не найден")
 
 
 def get_profile_service(
-    profile_repository: BaseProfileRepository = Depends(RedisProfileRepository),
+    profile_repository: BaseProfileRepository = Depends(get_profile_repository),
 ) -> DeleteProfileService:
     return DeleteProfileService(profile_repository=profile_repository)
