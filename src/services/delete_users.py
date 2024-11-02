@@ -12,7 +12,6 @@ class DeleteProfileService:
     def delete_profile(self, username: str):
         if self.__repository.exists(username):
             self.__repository.delete(username)
-            return {"message": "Профиль успешно удалён"}
         else:
             raise ProfileNotFound("Профиль не найден")
 

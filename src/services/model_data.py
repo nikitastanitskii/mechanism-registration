@@ -7,6 +7,6 @@ class UserProfileCreate(BaseModel):
     username: str
     name: str
     age: int
-    email: str | EmailStr
+    email: EmailStr
     address: str
     password: str

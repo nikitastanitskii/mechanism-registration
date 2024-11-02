@@ -14,22 +14,19 @@ class RedisProfileRepository(BaseProfileRepository):
         redis_connector.hset("profiles", profile.username, profile.model_dump_json())
 
     def update(self, username: str, updated_data: dict) -> None:
-        if not self.exists(username):
-            raise ProfileNotFound("Профиль не найден")
         current_profile_data = redis_connector.hget("profiles", username)
         if current_profile_data is None:
-            raise ProfileNotFound("Профиль не найден")
-        else:
-            profile_data = json.loads(current_profile_data)
-            profile_data.update(updated_data)
-            redis_connector.hset("profiles", username, json.dumps(profile_data))
+            return None
+        profile_data = json.loads(current_profile_data)
+        profile_data.update(updated_data)
+        redis_connector.hset("profiles", username, json.dumps(profile_data))
 
-    def get_profile(self, username: str) -> None:
+    def get_profile(self, username: str) -> UserProfileCreate:
         profile_data = redis_connector.hget("profiles", username)
         if profile_data:
             return json.loads(profile_data)
         else:
-            raise ProfileNotFound("Профиль не найден")
+            raise None
 
     def get(self, key: str) -> str:
         profile_data = redis_connector.hget("profiles", key)

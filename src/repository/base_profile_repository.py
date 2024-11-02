@@ -25,7 +25,7 @@ class BaseProfileRepository(ABC):
         pass
 
     @abstractmethod
-    def get(self, username: str) -> None:
+    def get(self, username: str) -> UserProfileCreate:
         pass
 
     def delete(self, username: UserProfileCreate) -> bool:

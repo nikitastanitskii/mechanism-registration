@@ -24,7 +24,7 @@ class UpdateProfile:
             updated_profile[key] = value
 
         self.__repository.update(username, updated_profile)
-        return {"message": "Профиль успешно обновлен"}
+        return None
 
 
 def get_update_profile_service(

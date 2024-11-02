@@ -10,7 +10,7 @@ class GetProfileUsers:
     def __init__(self, profile_repository: BaseProfileRepository):
         self.__repository = profile_repository
 
-    def get_profile(self, username: str):
+    def get_profile(self, username: str) -> UserProfileCreate:
         profile_data = self.__repository.get_profile(username)
 
         if profile_data is None:
