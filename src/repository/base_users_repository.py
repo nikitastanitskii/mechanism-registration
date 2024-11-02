@@ -7,11 +7,11 @@ class BaseUsersRepository(ABC):
         pass
 
     @abstractmethod
-    def create(self, username: str, password: str) -> None:
+    def get(self, username: str) -> str | dict:
         pass
 
     @abstractmethod
-    def get(self, username: str) -> str:
+    def create(self, username: str, password: str) -> dict:
         pass
 
     @abstractmethod

@@ -7,10 +7,11 @@ class RedisUsersRepository(BaseUsersRepository):
         return redis_connector.hexists("users", username)
 
     def create(self, username: str, password: str) -> None:
-        redis_connector.hset("users", username, password)
+        redis_connector.hset("users", username)
 
-    def get(self, username: str) -> str:
+    def get(self, username: str) -> dict:
         return redis_connector.hget("users", username)
 
-    def delete(self, username: str) -> dict:
-        pass
+    def delete(self, username: str) -> None:
+        if self.exists(username):
+            redis_connector.hdel("users", username)
